@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"auth-service/config"
-	"auth-service/internal/model"
+	"auth-service/internal/database"
 	"auth-service/internal/repository"
 	"auth-service/internal/router"
 	"auth-service/internal/service"
@@ -21,11 +21,7 @@ func main() {
 		log.Fatalf("failed to connect database: %v", err)
 	}
 
-	// Migrate the schema
-	if err := db.AutoMigrate(&model.User{}); err != nil {
-		log.Fatalf("failed to migrate database: %v", err)
-	}
-	log.Println("Database migrated successfully")
+	database.Migrate(db)
 
 	userRepo := repository.NewUserRepository(db)
 	authService := service.NewAuthService(userRepo, cfg.JWTSecret)
