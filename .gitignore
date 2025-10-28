@@ -1,0 +1,31 @@
+# Binaries for the current project
+*.exe
+*.dll
+*.so
+*.dylib
+*.wasm
+
+# Build output directories
+/bin/
+/pkg/
+
+# Dependency caches
+/vendor/
+go.sum
+
+# Test output files
+*.test
+*.out
+
+# IDE specific files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Log files and temporary files
+*.log
+*.tmp
+
+# Environment variable files
+.env

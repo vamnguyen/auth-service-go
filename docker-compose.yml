@@ -1,0 +1,25 @@
+services:
+  auth-db:
+    image: postgres:18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: auth_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - auth-pgdata:/var/lib/postgresql
+
+  auth-service:
+    build: .
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@auth-db:5432/auth_db?sslmode=disable
+      JWT_SECRET: mysecretkey
+      PORT: 9001
+    ports:
+      - "9001:9001"
+    depends_on:
+      - auth-db
+
+volumes:
+  auth-pgdata:
