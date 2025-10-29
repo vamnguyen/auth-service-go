@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
@@ -9,17 +10,21 @@ import (
 	"auth-service/internal/model"
 	"auth-service/internal/repository"
 	"auth-service/utils"
+
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
-	UserRepo *repository.UserRepository
-	JWTSecret string
+	UserRepo    *repository.UserRepository
+	RefreshRepo *repository.RefreshTokenRepository
+	JWTSecret   string
 }
 
-func NewAuthService(userRepo *repository.UserRepository, jwtSecret string) *AuthService {
+func NewAuthService(userRepo *repository.UserRepository, refreshRepo *repository.RefreshTokenRepository, jwtSecret string) *AuthService {
 	return &AuthService{
-		UserRepo: userRepo,
-		JWTSecret: jwtSecret,
+		UserRepo:    userRepo,
+		RefreshRepo: refreshRepo,
+		JWTSecret:   jwtSecret,
 	}
 }
 
@@ -50,4 +55,26 @@ func (s *AuthService) Login(email, password string) (string, error) {
 	// Generate JWT token
 	token, err := utils.GenerateToken(user.ID.String(), s.JWTSecret, 24*time.Hour)
 	return token, err
+}
+
+// GetMe returns the current user profile by userID (string UUID)
+func (s *AuthService) GetMe(userID string) (*model.User, error) {
+	id, err := uuid.Parse(userID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+	return s.UserRepo.FindUserByID(id)
+}
+
+// Logout revokes all refresh tokens of the current user (stateless access token remains valid until expiry)
+func (s *AuthService) Logout(userID string) error {
+	if s.RefreshRepo == nil {
+		return fmt.Errorf("refresh token repository not initialized")
+	}
+
+	id, err := uuid.Parse(userID)
+	if err != nil {
+		return fmt.Errorf("invalid user id: %w", err)
+	}
+	return s.RefreshRepo.RevokeAllByUser(id)
 }

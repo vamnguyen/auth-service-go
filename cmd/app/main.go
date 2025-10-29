@@ -24,7 +24,8 @@ func main() {
 	database.Migrate(db)
 
 	userRepo := repository.NewUserRepository(db)
-	authService := service.NewAuthService(userRepo, cfg.JWTSecret)
+	refreshRepo := repository.NewRefreshTokenRepository(db)
+	authService := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret)
 
 	r := router.SetupRouter(authService)
 	log.Println("Auth service running on port " + cfg.Port)
