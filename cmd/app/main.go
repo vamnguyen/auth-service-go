@@ -28,6 +28,6 @@ func main() {
 	authService := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret)
 
 	r := router.SetupRouter(authService)
-	log.Println("Auth service running on port " + cfg.Port)
+	log.Println("Auth Service running on port " + cfg.Port)
 	r.Run(":" + cfg.Port)
 }

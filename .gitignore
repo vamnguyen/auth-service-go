@@ -7,7 +7,7 @@
 
 # Build output directories
 /bin/
-/pkg/
+/tmp/
 
 # Dependency caches
 /vendor/
