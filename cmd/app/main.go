@@ -25,9 +25,16 @@ func main() {
 
 	userRepo := repository.NewUserRepository(db)
 	refreshRepo := repository.NewRefreshTokenRepository(db)
-	authService := service.NewAuthService(userRepo, refreshRepo, cfg.JWTSecret)
 
-	r := router.SetupRouter(authService)
+	authService := service.NewAuthService(
+		userRepo,
+		refreshRepo,
+		cfg.JWTSecret,
+		cfg.AccessTokenTTL,
+		cfg.RefreshTokenTTL,
+	)
+
+	r := router.SetupRouter(authService, cfg)
 	log.Println("Auth Service running on port " + cfg.Port)
 	r.Run(":" + cfg.Port)
 }
